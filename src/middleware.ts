@@ -1,23 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// This function can be marked `async` if using `await` inside
+// Site-wide basic auth gate.
+// Credentials come from environment variables (set them in Vercel → Project → Settings → Environment Variables):
+//   SITE_AUTH_USER
+//   SITE_AUTH_PASSWORD
+// If either is missing, the site stays locked rather than open.
 export function middleware(req: NextRequest) {
+  const expectedUser = process.env.SITE_AUTH_USER;
+  const expectedPassword = process.env.SITE_AUTH_PASSWORD;
   const basicAuth = req.headers.get('authorization');
-  const url = req.nextUrl;
 
-  if (basicAuth) {
-    const authValue = basicAuth.split(' ')[1];
+  if (expectedUser && expectedPassword && basicAuth) {
+    const authValue = basicAuth.split(' ')[1] ?? '';
     const [user, pwd] = atob(authValue).split(':');
 
-    // Currently hardcoded so only you can enter. 
-    // Username: admin
-    // Password: tracebridge2026
-    if (user === 'admin' && pwd === 'tracebridge2026') {
+    if (user === expectedUser && pwd === expectedPassword) {
       return NextResponse.next();
     }
   }
-
-  url.pathname = '/api/auth';
 
   return new NextResponse('Authentication Required', {
     status: 401,
@@ -27,11 +27,7 @@ export function middleware(req: NextRequest) {
   });
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-  // Match all request paths except for the ones starting with:
-  // - _next/static (static files)
-  // - _next/image (image optimization files)
-  // - favicon.ico (favicon file)
+  // Match all request paths except Next.js static assets and the favicon.
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

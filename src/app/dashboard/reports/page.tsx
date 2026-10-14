@@ -895,7 +895,7 @@ function ReportsContent() {
         
         currentY += 8;
         
-        const displayDeviceName = report.upload.deviceName ? report.upload.deviceName.replace(/demo\s*[-–:]*\s*/ig, '').replace(/^[-–:\s]+/, '').trim() : "Omnipod 5 / Horizon POD";
+        const displayDeviceName = report.upload.deviceName ? report.upload.deviceName.replace(/demo\s*[-–:]*\s*/ig, '').replace(/^[-–:\s]+/, '').trim() : "Demo Device";
         
         doc.setTextColor(themeColor[0], themeColor[1], themeColor[2]);
         doc.setFontSize(16);
@@ -1935,7 +1935,7 @@ function ReportsContent() {
                                     };
                                     const theme = themeMap[activeTemplate] || themeMap['510k'];
                                     const selectedSub = availableSubmissions.find(s => s.id === enginePayload);
-                                    const deviceName = selectedSub ? selectedSub.deviceName : "Omnipod 5 / Horizon POD";
+                                    const deviceName = selectedSub ? selectedSub.deviceName : "Demo Device";
                                     
                                     // Mock compliance math for demo presentation
                                     const mockGaps = [
