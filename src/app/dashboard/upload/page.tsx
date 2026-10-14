@@ -26,7 +26,7 @@ import { ProductCodeSelector } from "@/components/ProductCodeSelector";
 import fdaCodes from "@/lib/fda-product-codes.json";
 import { Sparkles } from "lucide-react";
 
-// Per-file limit: 50MB to support large real-world protocols (like Omnipod SAW)
+// Per-file limit: 50MB to support large real-world protocols (e.g. large software test protocols)
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 // Analysis steps for the step-by-step UI

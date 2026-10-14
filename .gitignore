@@ -38,3 +38,8 @@ tmp/
 *.jsonl
 test-results/
 
+
+# Local-only files (removed from the repo during BU Spark cleanup)
+.env.vercel
+scratch/
+test-screenshots/

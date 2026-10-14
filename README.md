@@ -1,42 +1,66 @@
 # TraceBridge AI
 
-Enterprise Regulatory & Quality Intelligence Engine for Medical Device Submissions.
+TraceBridge checks whether a medical device submission package agrees with itself before FDA reads it.
 
-> [!NOTE]
-> **BU Spark Contributors:** Please review the [BU Spark Team Branching & Collaboration Guide](BU_SPARK_WORKFLOW.md) before starting feature work. All student pull requests should target the `bu-spark` branch.
+> **BU Spark DS 549 team:** start with the [Branching & Collaboration Guide](BU_SPARK_WORKFLOW.md). All student work goes into the `bu-spark` branch through pull requests. Never push to `main`.
 
-## Getting Started
+## Built today vs. building this semester
 
+| | What it is | Where it lives |
+| --- | --- | --- |
+| **Built today** | A working prototype that checks Q-Sub (Pre-Submission) agreements against the evidence documents in a package and shows the matches and gaps in a traceability matrix. It runs on synthetic test packages. Accuracy has not been measured yet. | `main` (deployed to tracebridge.ai) |
+| **Building this semester** | A 510(k) pipeline that detects defects across documents (missing data, incomplete traceability, outdated references, undocumented controls), cites both sides of every finding, and is scored with precision and recall against planted errors. | `bu-spark` and your `spark/<feature>` branches |
+| **Founder's redesign** | A pre-eSTAR readiness check (Upload, Findings by eSTAR section, Review and export). Owned by James. | `redesign/pre-estar` (please don't commit here) |
 
-First, run the development server:
+## Tech stack
+
+- Next.js and TypeScript, deployed on Vercel
+- Firebase for sign-in, database (Firestore) and file storage
+- Google Gemini API for analysis (`GEMINI_MOCK_MODE=true` runs without calling the API)
+- Playwright for end-to-end tests
+
+## Run it locally
 
 ```bash
+git clone https://github.com/jameshardison2/tracebridge_ai-1.git
+cd tracebridge_ai-1
+git checkout bu-spark
+npm install
+cp .env.example .env.local   # then fill in the values James shares with you
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Never commit `.env.local` or any key, token or password. If you need a credential, ask James.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Where things are
 
-## Learn More
+| Folder | What's in it |
+| --- | --- |
+| `src/app/dashboard/` | The app's pages: upload, results, reports, traceability |
+| `src/app/api/` | Server routes: upload, analyze, gap, drift, traceability, precedents and others |
+| `src/pipeline/` | Analysis pipeline code |
+| `src/lib/` | Shared helpers, Firebase setup, FDA product code list |
+| `demo_data/` | Synthetic test documents used by scripts and tests |
+| `public/demo_data/` | Synthetic documents the app loads directly |
+| `FDA_Test_Dossiers/` | Three small synthetic dossiers (compliant, software failure, predicate failure) |
+| `scripts/` | Seeding, evaluation and data-generation scripts; `scripts/synthetic_dataset/` holds generated .docx packages |
+| `phase_2_files/` | FDA guidance and regulatory templates used for rules |
+| `tests/e2e/` | Playwright tests |
 
-To learn more about Next.js, take a look at the following resources:
+All test data in this repo is synthetic. Real company submission data is never committed here.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Useful commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the local dev server |
+| `npm run build` | Production build (run this before opening a PR) |
+| `npm run lint` | Lint the code |
+| `npm run eval:hostile` | Run the evaluation engine over `demo_data/` |
+| `npx playwright test` | Run the end-to-end tests |
 
-## Deploy on Vercel
+## Confidentiality
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Public FDA data is open. TraceBridge's dataset, curation and compiled data are confidential, and this repository is private. Don't copy code or data out of it.

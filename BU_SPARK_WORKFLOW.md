@@ -35,8 +35,8 @@ gitGraph
 
 ### Step 1: Clone and Checkout the Project
 ```bash
-git clone https://github.com/tracebridgeai-lab/tracebridge_ai.git
-cd tracebridge_ai
+git clone https://github.com/jameshardison2/tracebridge_ai-1.git
+cd tracebridge_ai-1
 npm install
 ```
 
