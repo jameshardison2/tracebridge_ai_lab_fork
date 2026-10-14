@@ -39,7 +39,11 @@ tmp/
 test-results/
 
 
-# Local-only files (removed from the repo during BU Spark cleanup)
-.env.vercel
-scratch/
+# Never commit environment files of any kind (keep the example)
+.env*
+!.env.example
+
+# Generated test output and personal scratch work
 test-screenshots/
+playwright-report/
+scratch/

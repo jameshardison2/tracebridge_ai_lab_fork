@@ -22,8 +22,8 @@ TraceBridge checks whether a medical device submission package agrees with itsel
 ## Run it locally
 
 ```bash
-git clone https://github.com/jameshardison2/tracebridge_ai-1.git
-cd tracebridge_ai-1
+git clone https://github.com/tracebridgeai-lab/tracebridge_ai.git
+cd tracebridge_ai
 git checkout bu-spark
 npm install
 cp .env.example .env.local   # then fill in the values James shares with you

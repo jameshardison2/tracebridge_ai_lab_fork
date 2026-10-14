@@ -21,13 +21,11 @@ export function middleware(req: NextRequest) {
 
   return new NextResponse('Authentication Required', {
     status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Secure Area"',
-    },
+    headers: { 'WWW-Authenticate': 'Basic realm="TraceBridge"' },
   });
 }
 
 export const config = {
-  // Match all request paths except Next.js static assets and the favicon.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Everything except API routes, Next static assets, and the favicon.
+  matcher: ['/((?!api/|_next/static|_next/image|favicon.ico).*)'],
 };
