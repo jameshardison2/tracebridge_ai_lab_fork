@@ -150,7 +150,7 @@ function Header({
                 <div className="flex items-center gap-2">
                     <div className="relative h-7 w-[2.75rem] shrink-0">
                         <Image
-                            src="/brand/icon_transparent.png"
+                            src="/brand/icon_transparent.png" unoptimized
                             alt="TraceBridge"
                             fill
                             className="object-contain"
@@ -160,7 +160,7 @@ function Header({
                         TraceBridge <span className="text-[var(--accent)]">AI</span>
                     </span>
                 </div>
-                <nav aria-label="Readiness check steps" className="flex gap-1.5 overflow-x-auto">
+                <nav aria-label="Readiness check steps" className="grid grid-cols-5 gap-1 md:flex md:gap-1.5">
                     {STEPS.map((label, i) => {
                         const current = i === step;
                         const done = i < step;
@@ -172,7 +172,7 @@ function Header({
                                 disabled={locked}
                                 aria-current={current ? "step" : undefined}
                                 onClick={() => onGo(i as Step)}
-                                className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                                className={`flex min-w-0 flex-col items-center gap-1 rounded-xl border px-1 py-1.5 text-[11px] font-medium transition-colors md:flex-row md:gap-2 md:rounded-full md:px-3 md:text-sm ${
                                     current
                                         ? "border-[var(--accent)] bg-[#f0fdfa] text-[var(--accent)]"
                                         : "border-[var(--border)] bg-white text-slate-600 hover:bg-slate-50"
@@ -187,8 +187,10 @@ function Header({
                                 >
                                     {done ? <Check className="h-3 w-3" /> : i + 1}
                                 </span>
-                                {label}
-                                {i === 4 && locked && <Lock className="h-3.5 w-3.5" />}
+                                <span className="flex items-center gap-1">
+                                    {label}
+                                    {i === 4 && locked && <Lock className="h-3 w-3 md:h-3.5 md:w-3.5" />}
+                                </span>
                             </button>
                         );
                     })}

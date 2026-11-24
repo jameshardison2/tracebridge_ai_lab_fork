@@ -28,7 +28,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between text-sm">
           <div className="flex items-center gap-3 group cursor-pointer">
             <div className="relative w-12 h-8 shrink-0">
-              <Image src="/brand/icon_transparent.png" alt="TraceBridge Icon" fill className="object-contain" />
+              <Image src="/brand/icon_transparent.png" unoptimized alt="TraceBridge Icon" fill className="object-contain" />
             </div>
             <span className="font-bold text-2xl tracking-tight text-slate-800">TraceBridge <span className="text-emerald-500">AI</span></span>
             <span className="hidden md:inline text-slate-500 ml-4 border-l border-slate-300 pl-4 text-xs font-medium tracking-wide">
