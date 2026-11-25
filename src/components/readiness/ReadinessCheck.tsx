@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
     ArrowRight,
     Check,
@@ -147,7 +148,7 @@ function Header({
     return (
         <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--card)]">
             <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-8">
-                <div className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2" aria-label="TraceBridge AI home">
                     <div className="relative h-7 w-[2.75rem] shrink-0">
                         <Image
                             src="/brand/icon_transparent.png" unoptimized
@@ -159,7 +160,7 @@ function Header({
                     <span className="text-xl font-bold tracking-tight text-[var(--foreground)]">
                         TraceBridge <span className="text-[var(--accent)]">AI</span>
                     </span>
-                </div>
+                </Link>
                 <nav aria-label="Readiness check steps" className="grid grid-cols-5 gap-1 md:flex md:gap-1.5">
                     {STEPS.map((label, i) => {
                         const current = i === step;

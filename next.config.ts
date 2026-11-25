@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
     },
   },
 
+  // One page after login: the old multi-tab dashboard home now sends people
+  // straight to the five-step readiness check. The other /dashboard/* pages
+  // stay in the code but are no longer linked from anywhere.
+  async redirects() {
+    return [{ source: "/dashboard", destination: "/check", permanent: false }];
+  },
+
   async headers() {
     return [
       {
