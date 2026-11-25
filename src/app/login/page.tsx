@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (!loading && user) {
-            router.push("/dashboard");
+            router.push("/check");
         }
     }, [user, loading, router]);
 
@@ -49,7 +49,7 @@ export default function LoginPage() {
         try {
             if (mode === "login") {
                 await signIn(email, password);
-                router.push("/dashboard");
+                router.push("/check");
             } else if (mode === "forgot") {
                 await resetPassword(email);
                 setSuccess("Password reset email sent! Check your inbox.");
@@ -72,7 +72,7 @@ export default function LoginPage() {
         setError("");
         try {
             await signInWithGoogle();
-            router.push("/dashboard");
+            router.push("/check");
         } catch (err: any) {
             if (err?.code !== "auth/popup-closed-by-user") {
                 setError(err?.message || "Google sign-in failed.");

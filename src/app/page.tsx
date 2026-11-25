@@ -67,7 +67,7 @@ export default function LandingPage() {
               TraceBridge AI audits the submission package you have already built. It checks that intended use, risk controls, requirements, and verification evidence agree across documents, and flags gaps against FDA guidance and the RTA (Refuse to Accept) checklist, with source citations.
             </p>
             <div className="flex gap-4 pt-4">
-              <Link href="/login" className="bg-slate-900 text-white hover:bg-slate-800 px-6 py-3 rounded-lg text-sm font-bold flex items-center gap-2 transition-all group shadow-lg shadow-slate-900/20">
+              <Link href="/check" className="bg-slate-900 text-white hover:bg-slate-800 px-6 py-3 rounded-lg text-sm font-bold flex items-center gap-2 transition-all group shadow-lg shadow-slate-900/20">
                 Evaluate Submission Package 
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
