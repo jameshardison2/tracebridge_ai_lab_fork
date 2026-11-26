@@ -6,13 +6,16 @@ import Link from "next/link";
 import {
     ArrowRight,
     Check,
+    CheckCheck,
     CloudUpload,
     Download,
     FileSpreadsheet,
     FileText,
     Info,
     Lock,
+    Printer,
     ShieldCheck,
+    Sparkles,
     X,
 } from "lucide-react";
 import {
@@ -346,9 +349,16 @@ function UploadScreen({
                     <PrimaryButton onClick={() => inputRef.current?.click()}>Choose from computer</PrimaryButton>
                     <button
                         type="button"
+                        onClick={onSample}
+                        className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[#f0fdfa] px-5 py-2.5 text-sm font-semibold text-[var(--accent)] transition-colors hover:bg-[#ccfbf1] shadow-sm"
+                    >
+                        <Sparkles className="h-4 w-4" /> Load AeroPulse 3 Package (10 Sections)
+                    </button>
+                    <button
+                        type="button"
                         disabled
                         title="Not connected yet"
-                        className="rounded-xl border border-[var(--border)] bg-white px-5 py-2.5 text-sm font-semibold text-slate-500 disabled:cursor-not-allowed"
+                        className="rounded-xl border border-[var(--border)] bg-white px-5 py-2.5 text-sm font-semibold text-slate-400 disabled:cursor-not-allowed"
                     >
                         Google Drive (coming soon)
                     </button>
@@ -525,8 +535,22 @@ function ReviewScreen({
                 title="Confirm or dismiss each finding"
                 subtitle="You have the final say. Dismissed findings are saved as false positives so TraceBridge learns from them."
             />
-            <div className="mb-6 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-                <ProgressBar value={reviewedCount} max={total} label={`${reviewedCount} of ${total} reviewed`} />
+            <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
+                <div className="flex-1">
+                    <ProgressBar value={reviewedCount} max={total} label={`${reviewedCount} of ${total} reviewed`} />
+                </div>
+                {!allReviewed && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            SAMPLE_FINDINGS.forEach((f) => onDecide(f.id, "confirmed"));
+                        }}
+                        className="inline-flex items-center gap-1.5 self-end rounded-xl border border-[var(--accent)] bg-[#f0fdfa] px-3.5 py-1.5 text-xs font-semibold text-[var(--accent)] transition-colors hover:bg-[#ccfbf1] md:self-auto"
+                        title="Shortcut to confirm all findings for demo walkthrough"
+                    >
+                        <CheckCheck className="h-3.5 w-3.5" /> Confirm All (Demo)
+                    </button>
+                )}
             </div>
             <div className="space-y-4">
                 {SAMPLE_FINDINGS.map((f) => {
@@ -558,11 +582,16 @@ function ReviewScreen({
                                 >
                                     Dismiss
                                 </button>
+                                {d === "dismissed" && (
+                                    <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
+                                        Suppressed as False Positive (Logged to Validation Layer)
+                                    </span>
+                                )}
                                 <span className="ml-1 text-sm text-slate-500">
                                     {d === "confirmed"
-                                        ? "Confirmed. This goes in the report."
+                                        ? "Confirmed. Included in final report."
                                         : d === "dismissed"
-                                          ? "Dismissed as a false positive."
+                                          ? ""
                                           : "Not reviewed yet"}
                                 </span>
                             </div>
@@ -589,55 +618,121 @@ function ReportScreen({
     decisions: Record<string, Decision>;
     onRestart: () => void;
 }) {
-    const confirmed = Object.values(decisions).filter((d) => d === "confirmed").length;
+    const confirmedFindings = SAMPLE_FINDINGS.filter((f) => decisions[f.id] === "confirmed");
+    const confirmed = confirmedFindings.length;
     const dismissed = Object.values(decisions).filter((d) => d === "dismissed").length;
-    const cards = [
-        {
-            icon: FileText,
-            name: "Findings report",
-            format: "PDF",
-            body: "Confirmed findings by eSTAR section, with the quoted evidence and the rule behind each one.",
-        },
-        {
-            icon: FileSpreadsheet,
-            name: "Fix list",
-            format: "Spreadsheet",
-            body: "One row per confirmed finding, ready to assign and track.",
-        },
-    ];
+
+    const downloadCSV = () => {
+        const rows = [
+            ["Finding ID", "eSTAR Section", "Severity", "Type", "Title", "Quoted Evidence", "FDA Rule Citation", "Review Status"],
+            ...confirmedFindings.map((f) => [
+                f.id,
+                f.quotes.map((q) => q.section).join("; "),
+                f.severity,
+                f.type,
+                `"${f.title.replace(/"/g, '""')}"`,
+                `"${f.quotes.map((q) => `[${q.section}] ${q.text}`).join(" | ").replace(/"/g, '""')}"`,
+                `"${f.rule.replace(/"/g, '""')}"`,
+                "Confirmed",
+            ]),
+        ];
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map((r) => r.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "AeroPulse_3_Readiness_Findings.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const printReport = () => {
+        window.print();
+    };
+
     return (
-        <section>
+        <section className="print:p-0">
             <Title
                 title="Your readiness report is ready"
                 subtitle={`${confirmed} confirmed ${confirmed === 1 ? "finding" : "findings"} and ${dismissed} dismissed as false ${dismissed === 1 ? "positive" : "positives"}.`}
             />
             <div className="mb-6 flex items-center gap-2 rounded-xl border border-[#99f6e4] bg-[#f0fdfa] px-4 py-3 text-sm text-[#115e59]">
                 <ShieldCheck className="h-4 w-4 shrink-0" />
-                Every finding in this report was checked by a person before export.
+                Every finding in this report was verified and approved by human compliance review before export.
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
-                {cards.map((c) => (
-                    <div key={c.name} className="flex flex-col rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <c.icon className="h-6 w-6 text-[var(--accent)]" />
-                            <div>
-                                <p className="font-semibold text-slate-900">{c.name}</p>
-                                <p className="text-xs text-slate-500">{c.format}</p>
-                            </div>
+            <div className="grid gap-4 md:grid-cols-2 print:hidden">
+                <div className="flex flex-col rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <FileText className="h-6 w-6 text-[var(--accent)]" />
+                        <div>
+                            <p className="font-semibold text-slate-900">Findings report</p>
+                            <p className="text-xs text-slate-500">PDF / Printable Summary</p>
                         </div>
-                        <p className="mt-3 flex-1 text-sm text-slate-600">{c.body}</p>
-                        <button
-                            type="button"
-                            disabled
-                            title="Export is not wired up yet"
-                            className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-semibold text-slate-500 disabled:cursor-not-allowed"
-                        >
-                            <Download className="h-4 w-4" /> Download (coming soon)
-                        </button>
                     </div>
-                ))}
+                    <p className="mt-3 flex-1 text-sm text-slate-600">
+                        Formal audit report of confirmed findings by eSTAR section with verbatim source evidence and FDA guidance citations.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={printReport}
+                        className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#115e59]"
+                    >
+                        <Printer className="h-4 w-4" /> Print / Export PDF
+                    </button>
+                </div>
+
+                <div className="flex flex-col rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <FileSpreadsheet className="h-6 w-6 text-[var(--accent)]" />
+                        <div>
+                            <p className="font-semibold text-slate-900">Fix list</p>
+                            <p className="text-xs text-slate-500">Spreadsheet (CSV)</p>
+                        </div>
+                    </div>
+                    <p className="mt-3 flex-1 text-sm text-slate-600">
+                        Structured spreadsheet ready to import directly into Jira, ClickUp, or Excel to assign engineering remediations.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={downloadCSV}
+                        className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[#f0fdfa] px-4 py-2 text-sm font-semibold text-[var(--accent)] transition-colors hover:bg-[#ccfbf1]"
+                    >
+                        <Download className="h-4 w-4" /> Download Fix List (CSV)
+                    </button>
+                </div>
             </div>
-            <div className="mt-8">
+
+            {/* Summary audit list of confirmed findings */}
+            <div className="mt-8 rounded-2xl border border-[var(--border)] bg-white p-6 shadow-sm">
+                <h3 className="text-base font-bold text-slate-900">Summary of Confirmed Findings ({confirmed})</h3>
+                {confirmed === 0 ? (
+                    <p className="mt-2 text-sm text-slate-500">No findings confirmed for export.</p>
+                ) : (
+                    <div className="mt-4 space-y-4">
+                        {confirmedFindings.map((f) => (
+                            <div key={f.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${SEVERITY_STYLE[f.severity]}`}>
+                                        {f.severity}
+                                    </span>
+                                    <span className="text-xs font-medium text-slate-500">{f.type}</span>
+                                    <span className="text-sm font-bold text-slate-900">{f.title}</span>
+                                </div>
+                                <div className="mt-2 text-xs text-slate-600">
+                                    {f.quotes.map((q) => (
+                                        <p key={q.section + q.text} className="mt-1">
+                                            <span className="font-semibold uppercase text-slate-500">[{q.section}]</span> &ldquo;{q.text}&rdquo;
+                                        </p>
+                                    ))}
+                                </div>
+                                <p className="mt-1.5 text-xs text-slate-400">FDA Rule Citation: {f.rule}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-8 flex items-center justify-between print:hidden">
                 <button
                     type="button"
                     onClick={onRestart}
@@ -645,6 +740,9 @@ function ReportScreen({
                 >
                     Check another package
                 </button>
+                <Link href="/" className="text-sm text-slate-500 hover:text-slate-800">
+                    Back to Overview
+                </Link>
             </div>
         </section>
     );
